@@ -1,16 +1,17 @@
 class Bullet
 
-	def initialize(window, team, x, y) 
+	def initialize(window, team, x, y, dir) 
 		@speed = 10
 		@gameWindow = window
 		@team = team
 		@x = x
 		@y = y
 		@img = Gosu::Image.new(window, "kappa.jpg", false)
+		@dir = dir
 	end
 
-	def move(dir)
-		case dir 
+	def move
+		case @dir 
 		when :up
 			@y -= @speed
 		when :down

@@ -8,6 +8,7 @@ end
 class TankState
 	SELECTED = :selected 
 	RECORDING = :recording
+	NOT_SELECTED = :not_selected 
 
 end
 
@@ -33,47 +34,60 @@ class Tank
 		@img = Gosu::Image.new(window, "kappa.jpg", false)
 		@prev_direction = nil
 		@bullets = Array.new()
+		@shot_time = 50
+		@time_until_shot = @shot_time
+		@state = TankState::SELECTED
 	end
 
 	def update
 		
-		dir = nil
-		num_directions_pressed = 0
-		if @gameWindow.button_down? Gosu::Gp0Left then
-			#move(Direction::LEFT)
-			dir = Direction::LEFT
-			num_directions_pressed += 1
-		end
-		if @gameWindow.button_down? Gosu::Gp0Right then
-			#move(Direction::RIGHT)
-			dir = Direction::RIGHT
-			num_directions_pressed += 1
-		end
-		if @gameWindow.button_down? Gosu::Gp0Up then
-			#move(Direction::UP)
-			dir = Direction::UP
-			num_directions_pressed += 1
-		end
-		if @gameWindow.button_down? Gosu::Gp0Down then
-			#move(Direction::DOWN)
-			dir = Direction::DOWN
-			num_directions_pressed += 1
-		end
-		if num_directions_pressed == 1
-			move(dir)
-		end
 
-		if @gameWindow.button_down? Gosu::Gp0Button1 then
-			if isSelected then
-				isSelected = false
-			else
-				isSelected = true
+		case @state
+		when TankState::SELECTED	
+			dir = nil
+			num_directions_pressed = 0
+			if @gameWindow.button_down?(Gosu::Gp0Left) || @gameWindow.button_down?(Gosu::KbLeft) then
+				dir = Direction::LEFT
+				num_directions_pressed += 1
+			end
+			if @gameWindow.button_down?(Gosu::Gp0Right) || @gameWindow.button_down?(Gosu::KbRight) then
+				dir = Direction::RIGHT
+				num_directions_pressed += 1
+			end
+			if @gameWindow.button_down?(Gosu::Gp0Up) || @gameWindow.button_down?(Gosu::KbUp) then
+				dir = Direction::UP	
+				num_directions_pressed += 1
+			end
+			if @gameWindow.button_down?(Gosu::Gp0Down) || @gameWindow.button_down?(Gosu::KbDown) then
+				dir = Direction::DOWN
+				num_directions_pressed += 1
+			end
+			if num_directions_pressed == 1
+				move(dir)
+				if dir != nil
+					@prev_direction = dir
+				end
+
+			end
+
+			if @gameWindow.button_down?(Gosu::Gp0Button1) || @gameWindow.button_down?(Gosu::KbSpace) then
+				@state = TankState::NOT_SELECTED
+				@time_until_shot = @shot_time
+			end
+		when TankState::NOT_SELECTED
+			@time_until_shot -= 1
+			if @time_until_shot <= 0
+				@bullets.push(Bullet.new(@gameWindow, @team, @x, @y, @prev_direction)) #fix this.
+				@time_until_shot = @shot_time
+			end
+			if @gameWindow.button_down?(Gosu::Gp0Button1) || @gameWindow.button_down?(Gosu::KbSpace) then
+				@state = TankState::SELECTED
 			end
 		end
-		if isSelected then
-			@bullets.push(Bullet.new(@gameWindow, @img, @x, @y))
-		end
 
+		@bullets.each do |bullet|
+			bullet.move
+		end
 	end
 
 	def draw
@@ -99,5 +113,18 @@ class Tank
 		@x %= 1280
 		@y %= 800
 	end
+
+	def trans_selected_to_not_selected #todo: ouauuau
+	end
+
+	def toggle(bool) 
+		if bool == true then
+			bool = false
+		else
+			bool = true
+		end
+	end
+
+
 end 
 
