@@ -1,12 +1,9 @@
-class Bullet
+class Bullet < Entity
 
-	def initialize(window, team, x, y, dir) 
-		@speed = 10
-		@gameWindow = window
+	def initialize(x, y, width, height, img, gameWindow, team, speed, dir) 
+		super(x, y, width, height, img, gameWindow)
 		@team = team
-		@x = x
-		@y = y
-		@img = Gosu::Image.new(window, "kappa.jpg", false)
+		@speed = speed
 		@dir = dir
 	end
 
@@ -28,6 +25,10 @@ class Bullet
 	end
 
 	def draw
-		@img.draw_rot(@x, @y, 1, 0)
+		super()
 	end 
+
+	def update
+		move()
+	end
 end
