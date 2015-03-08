@@ -1,9 +1,12 @@
 class Player
 
+	attr_accessor :tanks
+	attr_accessor :input_map
+
 	def initialize(gameWindow)
 		@gameWindow = gameWindow
 		@tanks = Array.new()
-		@img = Gosu::Image.new(@gameWindow, "kappa.jpg", false)
+		@img = Gosu::Image.new(@gameWindow, "tank.png", false)
 		@player1_controls = {
 			:up => Gosu::Gp0Up,
 			:down => Gosu::Gp0Down,
@@ -11,11 +14,14 @@ class Player
 			:right => Gosu::Gp0Right,
 			:t1 => Gosu::Gp0Button0,
 			:t2 => Gosu::Gp0Button1,
-			:t3 => Gosu::Gp0Button2
+			:t3 => Gosu::Gp0Button2,
+			:record => Gosu::Gp0Button3,
+			:debug => Gosu::Gp0Button4
 		}
-		@tanks.push(Tank.new(5, 5, 50, 50, @img, @gameWindow, 1, @player1_controls, :t1))
-		@tanks.push(Tank.new(100, 100, 50, 50, @img, @gameWindow, 1, @player1_controls, :t2))
-		@tanks.push(Tank.new(200, 200, 50, 50, @img, @gameWindow, 1, @player1_controls, :t3))
+		@input_map = @player1_controls
+		@tanks.push(Tank.new(5, 5, 50, 50, @img, @gameWindow, 1, self, :t1))
+		@tanks.push(Tank.new(100, 100, 50, 50, @img, @gameWindow, 1, self, :t2))
+		@tanks.push(Tank.new(200, 200, 50, 50, @img, @gameWindow, 1, self, :t3))
 
 		#@p1 = Tank.new(5, 5, 50, 50, @img, self, 1)
 		
@@ -39,6 +45,33 @@ class Player
 			tank.draw()
 		end
 	end
+
+	def button_down(id)
+		case id
+		when @input_map[:t1]
+			toggle_state(:t1)	
+		when @input_map[:t2]
+			toggle_state(:t2)
+		when @input_map[:t3]
+			toggle_state(:t3)
+		end
+	end
+
+	def toggle_state(id) 
+		@tanks.each do |tank|
+			if tank.state.get_state_name() == :selected
+				if tank.input_queue.size > 1
+					tank.state = PlaybackState.new(@gameWindow, tank)
+				else
+					tank.state = NotSelectedState.new(@gameWindow, tank)
+				end 
+			elsif tank.id == id
+				tank.state = SelectedState.new(@gameWindow, tank)
+			end
+		end
+	end
+
+	
 
 
 end

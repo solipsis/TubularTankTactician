@@ -23,4 +23,6 @@ class FPSCounter
 	def draw
 		@font.draw("FPS: " + @fps.to_s, 0, 0, 20) if @show_fps
 	end
+
+	
 end

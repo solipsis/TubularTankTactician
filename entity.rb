@@ -1,11 +1,8 @@
 class Entity
 	
-	@x
-	@y
-	@width
-	@height
-	@img
-	@gameWindow
+	
+
+	attr_accessor :x, :y, :width, :height
 
 	def initialize(x, y, width, height, img, gameWindow)
 		@x = x
@@ -25,6 +22,14 @@ class Entity
 	end
 
 	def update
+	end
+
+	def intersects?(e2)
+		return (@x <= (e2.x + e2.width) &&
+				e2.x <= (@x + @width) &&
+				@y <= (e2.y + e2.height) &&
+				e2.y <= (@y + @height)
+		)
 	end
 
 end

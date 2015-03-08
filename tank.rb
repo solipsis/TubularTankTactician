@@ -9,9 +9,47 @@ class TankState
 	def update
 
 	end
+
+	def get_state_name
+		return :default
+	end
+end
+
+
+class PlaybackState < TankState
+	def initialize(gameWindow, tank)
+		super(gameWindow, tank)
+		@input_queue = tank.input_queue
+	end
+
+	def update
+
+		if (@input_queue.size > 0)
+			old_x = @tank.x
+			old_y = @tank.y
+			@tank.move(@input_queue.first)
+			if (old_x == @tank.x && old_y == @tank.y)
+				@input_queue.delete_at(0)
+			end
+
+		else
+			@tank.state = NotSelectedState.new(@gameWindow, @tank)
+		end
+	end
+
+	def get_state_name
+		return :playback
+	end
 end
 
 class SelectedState < TankState
+
+	def initialize(gameWindow, tank)
+		super(gameWindow, tank)
+		#@tank.reset_input_queue()
+		@prev_dir = nil
+	end
+
 	def update
 		dir = nil
 		num_directions_pressed = 0
@@ -31,14 +69,29 @@ class SelectedState < TankState
 			dir = :down
 			num_directions_pressed += 1
 		end
+
+
 		if num_directions_pressed == 1
-			@tank.move(dir)
+			if @gameWindow.button_down?(@tank.input_map[:record])
+				if (@prev_dir != dir)
+					@tank.input_queue.push(dir)
+					#puts @tank.input_queue.to_s
+					@prev_dir = dir
+				end
+			else
+				@tank.move(dir)
+			end
+			
 		end
 
 		#TODO: state transition logic should be kept higher up
 		if @gameWindow.button_down?(@tank.input_map[@tank.id]) || @gameWindow.button_down?(Gosu::KbSpace) then
-			@tank.state = NotSelectedState.new(@gameWindow, @tank)			
+			#@tank.state = NotSelectedState.new(@gameWindow, @tank)			
 		end	
+	end
+
+	def get_state_name
+		return :selected
 	end
 end
 
@@ -56,8 +109,12 @@ class NotSelectedState < TankState
 
 		#TODO: state transition logic should be kept higher up
 		if @gameWindow.button_down?(@tank.input_map[@tank.id]) || @gameWindow.button_down?(Gosu::KbSpace) then
-			@tank.state = SelectedState.new(@gameWindow, @tank)
+			#@tank.state = SelectedState.new(@gameWindow, @tank)
 		end
+	end
+
+	def get_state_name
+		return :not_selected
 	end
 end
 
@@ -72,13 +129,15 @@ class Tank < Entity
 	attr_accessor :state
 	attr_accessor :input_map
 	attr_accessor :id
+	attr_accessor :input_queue
 
 	
 	#TODO: find better place for input map
-	def initialize(x, y, width, height, img, gameWindow, team, input_map, id)
+	def initialize(x, y, width, height, img, gameWindow, team, player, id)
 		super(x, y, width, height, img, gameWindow)
 		@id = id
-		@input_map = input_map
+		@player = player
+		@input_map = player.input_map
 		@team = team
 		@speed = 5
 		@health = 1
@@ -86,12 +145,20 @@ class Tank < Entity
 		@shot_time = 50
 		@remaining_time = @shot_time
 		@state = SelectedState.new(@gameWindow, self)
+		@input_queue = Array.new()		
 	end
 
 	def update
 		@state.update()
+
+		#TODO: Optomize the shit out of this trash
 		@bullets.each do |bullet|
 			bullet.update()
+			@gameWindow.obstacles.each do |obs|
+				if bullet.intersects?(obs)
+					@bullets.delete(bullet)
+				end
+			end
 		end
 	end
 
@@ -104,6 +171,8 @@ class Tank < Entity
 	end
 
 	def move(dir)
+		old_x = @x
+		old_y = @y
 		case dir 
 		when :up
 			@y -= @speed
@@ -113,6 +182,23 @@ class Tank < Entity
 			@x += @speed
 		when :left
 			@x -= @speed
+		end
+
+		@player.tanks.each do |tank|
+			if(self.intersects?(tank) && tank != self)
+				@x = old_x
+				@y = old_y
+				#puts "intersect"
+				break
+			end
+		end
+
+		@gameWindow.obstacles.each do |obs|
+			if(self.intersects?(obs))
+				@x = old_x
+				@y = old_y
+				break
+			end
 		end
 
 		# screen wrap
@@ -134,6 +220,9 @@ class Tank < Entity
 		@remaining_time = @shot_time
 	end
 
+	def reset_input_queue
+		@input_queue = Array.new()
+	end
 
 end 
 
