@@ -12,16 +12,18 @@ class Player
 			:down => Gosu::Gp0Down,
 			:left => Gosu::Gp0Left,
 			:right => Gosu::Gp0Right,
-			:t1 => Gosu::Gp0Button0,
-			:t2 => Gosu::Gp0Button1,
-			:t3 => Gosu::Gp0Button2,
-			:record => Gosu::Gp0Button3,
+			:t1 => Gosu::Gp0Button2,
+			:t2 => Gosu::Gp0Button3,
+			:t3 => Gosu::Gp0Button1,
+			:record => Gosu::Gp0Button0,
 			:debug => Gosu::Gp0Button4
 		}
+		
+
 		@input_map = @player1_controls
-		@tanks.push(Tank.new(5, 5, 50, 50, @img, @gameWindow, 1, self, :t1))
-		@tanks.push(Tank.new(100, 100, 50, 50, @img, @gameWindow, 1, self, :t2))
-		@tanks.push(Tank.new(200, 200, 50, 50, @img, @gameWindow, 1, self, :t3))
+		@tanks.push(Tank.new(100, 100, 50, 50, @img, @gameWindow, 1, self, :t1))
+		@tanks.push(Tank.new(200, 200, 50, 50, @img, @gameWindow, 1, self, :t2))
+		@tanks.push(Tank.new(300, 300, 50, 50, @img, @gameWindow, 1, self, :t3))
 
 		#@p1 = Tank.new(5, 5, 50, 50, @img, self, 1)
 		

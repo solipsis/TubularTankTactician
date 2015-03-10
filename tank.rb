@@ -151,9 +151,10 @@ class Tank < Entity
 		@bullets = Array.new()
 		@shot_time = 50
 		@remaining_time = @shot_time
-		@state = SelectedState.new(@gameWindow, self)
+		@state = NotSelectedState.new(@gameWindow, self)
 		@input_queue = Array.new()
-		@flag = nil		
+		@flag = nil
+		@font = Gosu::Font.new(gameWindow, Gosu::default_font_name, 40)		
 	end
 
 	def update
@@ -182,6 +183,7 @@ class Tank < Entity
 
 	def draw
 		super()
+		drawKey()
 		#@img.draw_rot(@x, @y, 1, 0)
 		@bullets.each do |x|
 			x.draw()
@@ -225,8 +227,15 @@ class Tank < Entity
 		end
 
 		@gameWindow.flags.each do |flag|
-			if (self.intersects?(flag) && flag.team != @team)
-				grabFlag(flag)
+			if (self.intersects?(flag))
+				if flag.team != @team
+					grabFlag(flag)
+				elsif (flag.team == @team && @has_flag)
+					@gameWindow.scoreCounter.score(@team)
+					@flag.drop
+					@flag = nil
+					@has_flag = false
+				end
 			end
 		end
 
@@ -307,6 +316,17 @@ class Tank < Entity
 			end
 		end
 		@dead = false
+	end
+
+	def drawKey
+		case @id
+		when :t1
+			@font.draw("X", @x + 10, @y + 10, 20)
+		when :t2
+			@font.draw("Y", @x + 10, @y + 10, 20)
+		when :t3
+			@font.draw("B", @x + 10, @y + 10, 20)
+		end
 	end
 
 end 

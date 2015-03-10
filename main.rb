@@ -1,5 +1,6 @@
 require 'gosu'
 require_relative 'fpscounter'
+require_relative 'scoreCounter'
 require_relative 'entity'
 require_relative 'tank'
 require_relative 'player'
@@ -8,12 +9,13 @@ require_relative 'flag'
 
 class GameWindow < Gosu::Window
 	
-	attr_accessor :players, :obstacles, :flags
+	attr_accessor :players, :obstacles, :flags, :scoreCounter
 
 	def initialize
 		super 1280, 800, false
 		self.caption = "Tubular Tank Tactician"
 		@fpscounter = FPSCounter.new(self)
+		@scoreCounter = ScoreCounter.new(self)
 		@background = Gosu::Image.new(self, "background.png", false)
 		@img = Gosu::Image.new(self, "kappa.jpg", false)
 		@obstacle_img = Gosu::Image.new(self, "obstacle.png", false)
@@ -36,6 +38,7 @@ class GameWindow < Gosu::Window
 	def draw
 		@background.draw(0,0,0)
 		@fpscounter.draw()
+		@scoreCounter.draw()
 
 		
 		@players.each do |ent|
