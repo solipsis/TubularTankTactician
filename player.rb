@@ -2,11 +2,15 @@ class Player
 
 	attr_accessor :tanks
 	attr_accessor :input_map
+	attr_accessor :bullet_image
 
 	def initialize(gameWindow)
 		@gameWindow = gameWindow
 		@tanks = Array.new()
-		@img = Gosu::Image.new(@gameWindow, "tank2.png", false)
+		
+		@img = Gosu::Image.new(@gameWindow, "tank1_dark.png", false)
+		@bullet_image = Gosu::Image.new(@gameWindow, "bullet1.png", false)
+
 		@player1_controls = {
 			:up => Gosu::Gp0Up,
 			:down => Gosu::Gp0Down,
@@ -21,9 +25,9 @@ class Player
 		
 
 		@input_map = @player1_controls
-		@tanks.push(Tank.new(100, 100, 50, 50, @img, @gameWindow, 1, self, :t1))
-		@tanks.push(Tank.new(200, 200, 50, 50, @img, @gameWindow, 1, self, :t2))
-		@tanks.push(Tank.new(300, 300, 50, 50, @img, @gameWindow, 1, self, :t3))
+		@tanks.push(Tank.new(100, 100, 50.0, 50.0, @img, @gameWindow, 1, self, :t1))
+		@tanks.push(Tank.new(200, 200, 50.0, 50.0, @img, @gameWindow, 1, self, :t2))
+		@tanks.push(Tank.new(300, 300, 50.0, 50.0, @img, @gameWindow, 1, self, :t3))
 
 		#@p1 = Tank.new(5, 5, 50, 50, @img, self, 1)
 		
@@ -65,7 +69,7 @@ class Player
 	def toggle_state(id) 
 		@tanks.each do |tank|
 			if tank.state.get_state_name() == :selected
-				if tank.input_queue.size > 1
+				if tank.input_queue.size > 0
 					tank.state = PlaybackState.new(@gameWindow, tank)
 				else
 					tank.state = NotSelectedState.new(@gameWindow, tank)
