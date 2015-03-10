@@ -1,4 +1,4 @@
-class Map
+class Map 
 
 	def initialize()
 		@x = 0
@@ -8,6 +8,9 @@ class Map
 		
 		@map_components = Array.new()
 		@selected_entity
+
+		@obstacles
+		
 	end
 
 	def select_entity

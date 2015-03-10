@@ -6,7 +6,7 @@ class Player
 	def initialize(gameWindow)
 		@gameWindow = gameWindow
 		@tanks = Array.new()
-		@img = Gosu::Image.new(@gameWindow, "tank.png", false)
+		@img = Gosu::Image.new(@gameWindow, "tank2.png", false)
 		@player1_controls = {
 			:up => Gosu::Gp0Up,
 			:down => Gosu::Gp0Down,
@@ -54,7 +54,10 @@ class Player
 			toggle_state(:t2)
 		when @input_map[:t3]
 			toggle_state(:t3)
+		when @input_map[:debug]
+			@tanks[2].die()
 		end
+
 	end
 
 	def toggle_state(id) 

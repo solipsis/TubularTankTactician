@@ -135,6 +135,13 @@ class Tank < Entity
 	#TODO: find better place for input map
 	def initialize(x, y, width, height, img, gameWindow, team, player, id)
 		super(x, y, width, height, img, gameWindow)
+
+		#clean up all these useless instance variables scrub
+		@death_time = 300
+		@time_till_respawn = @death_time
+		@dead = false
+		@init_x = x
+		@init_y = y
 		@id = id
 		@player = player
 		@input_map = player.input_map
@@ -145,11 +152,22 @@ class Tank < Entity
 		@shot_time = 50
 		@remaining_time = @shot_time
 		@state = SelectedState.new(@gameWindow, self)
-		@input_queue = Array.new()		
+		@input_queue = Array.new()
+		@flag = nil		
 	end
 
 	def update
 		@state.update()
+
+
+		#make this a state dumbass
+		if (@dead)
+			@time_till_respawn -= 1
+			if @time_till_respawn < 0
+				respawn()
+			end
+		end
+
 
 		#TODO: Optomize the shit out of this trash
 		@bullets.each do |bullet|
@@ -173,15 +191,20 @@ class Tank < Entity
 	def move(dir)
 		old_x = @x
 		old_y = @y
+		speed = @speed
+		if (@has_flag)
+			speed = speed * (2.0/3.0)
+		end
+
 		case dir 
 		when :up
-			@y -= @speed
+			@y -= speed
 		when :down
-			@y += @speed
+			@y += speed
 		when :right
-			@x += @speed
+			@x += speed
 		when :left
-			@x -= @speed
+			@x -= speed
 		end
 
 		@player.tanks.each do |tank|
@@ -201,12 +224,31 @@ class Tank < Entity
 			end
 		end
 
+		@gameWindow.flags.each do |flag|
+			if (self.intersects?(flag) && flag.team != @team)
+				grabFlag(flag)
+			end
+		end
+
 		# screen wrap
-		@x %= 1280
-		@y %= 800
+		#@x %= 1280
+		#@y %= 800
 	end
 
-	
+
+	#holy shit are u serious
+	def can_spawn?
+		
+	end
+
+
+	def grabFlag(flag)
+		flag.grab()
+		@has_flag = true
+		@flag = flag
+	end
+
+
 	def toggle(bool) 
 		if bool == true then
 			bool = false
@@ -222,6 +264,49 @@ class Tank < Entity
 
 	def reset_input_queue
 		@input_queue = Array.new()
+	end
+
+	#dafuq is this shit
+	def die
+		#seriously wtf
+		@dead = true
+		if (@has_flag)
+			@has_flag = false
+			@flag.drop()
+			@flag = nil
+		end
+		
+		#@flag = nil
+		@x = -500
+		@y = -500
+		@time_till_respawn = @death_time
+		#start death countdown timer
+	end
+
+	def respawn
+
+		dead_x = @x
+		dead_y = @y
+
+		@x = @init_x
+		@y = @init_y
+
+		@player.tanks.each do |tank|
+			if(self.intersects?(tank) && tank != self)
+				@x = dead_x
+				@y = dead_y
+				return
+			end
+		end
+
+		@gameWindow.obstacles.each do |obs|
+			if(self.intersects?(obs))
+				@x = dead_x
+				@y = dead_y
+				return
+			end
+		end
+		@dead = false
 	end
 
 end 
