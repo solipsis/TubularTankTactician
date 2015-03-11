@@ -398,11 +398,11 @@ class Tank < Entity
 	def drawKey
 		case @id
 		when :t1
-			@font.draw("X", @x + 12, @y + 5, 20)
+			@font.draw("X", @x + 14, @y + 9, 20)
 		when :t2
-			@font.draw("Y", @x + 12, @y + 5, 20)
+			@font.draw("Y", @x + 14, @y + 9, 20)
 		when :t3
-			@font.draw("B", @x + 12, @y + 5, 20)
+			@font.draw("B", @x + 14, @y + 9, 20)
 		end
 	end
 

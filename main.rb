@@ -20,7 +20,7 @@ class GameWindow < Gosu::Window
 		@background = Gosu::Image.new(self, "background.png", false)
 		@img = Gosu::Image.new(self, "kappa.jpg", false)
 		@obstacle_img = Gosu::Image.new(self, "obstacle.png", false)
-		@flag_img = Gosu::Image.new(self, "kappa.jpg", false)
+		@flag_img = Gosu::Image.new(self, "flag.png", false)
 		#@p1 = Tank.new(5, 5, 50, 50, @img, self, 1)
 
 
@@ -58,25 +58,29 @@ class GameWindow < Gosu::Window
 
 
 
-
+@squareImg = Gosu::Image.new(self, "square.png", false)
 		@obstacles = Array.new()
-		@obstacles.push(Obstacle.new(0,100, 1000, 40, @obstacle_img, self)) #top bar
-		@obstacles.push(Obstacle.new(0,720, 1000, 40, @obstacle_img, self)) #bottom bar
+		@obstacles.push(Obstacle.new(0,100, 1000, 40, @squareImg, self)) #top bar
+		@obstacles.push(Obstacle.new(0,720, 1000, 40, @squareImg, self)) #bottom bar
 		mirrorObs(0, 100, 40, 620) 
 		mirrorObs(40, 140, 150, 60) # top corners
 		mirrorObs(300, 200, 120, 15)
 		mirrorObs(490, 225, 10, 60)
 		mirrorObs(480, 320, 20, 200)
 		mirrorObs(400, 600, 100, 10)
-		mirrorObs(460, 680, 40, 40)
-		mirrorObs(200, 675, 40, 45)
-		mirrorObs(300, 620, 40, 40)
-		mirrorObs(110, 540, 50, 50)
-		mirrorObs(225, 515, 50, 8)
-		mirrorObs(225, 460, 8, 55)
-		mirrorObs(300, 380, 50, 10)
-		mirrorObs(350, 500, 30, 30)
-		mirrorObs(155, 290, 50, 50)
+
+		
+		mirrorObs(460, 680, 40, 40, @squareImg)
+		mirrorObs(200, 675, 40, 45, @squareImg)
+		mirrorObs(300, 620, 40, 40, @squareImg)
+		mirrorObs(110, 540, 50, 50, @squareImg)
+		
+
+		mirrorObs(225, 515, 50, 8, @squareImg)
+		mirrorObs(225, 460, 8, 55, @squareImg)
+		mirrorObs(300, 380, 50, 10, @squareImg)
+		mirrorObs(350, 500, 30, 30, @squareImg)
+		mirrorObs(155, 290, 50, 50, @squareImg)
 
 
 		# @obstacles.push(Obstacle.new(0,0, 50, 800, @obstacle_img, self))
@@ -101,12 +105,13 @@ class GameWindow < Gosu::Window
 
 		
 		@flags = Array.new()
-		@flags.push(Flag.new(100, 400, 30, 30, @flag_img, self, 1))
-		@flags.push(Flag.new(870, 400, 30, 30, @flag_img, self, 2))
+		@flags.push(Flag.new(95, 400, 40, 40, @flag_img, self, 1))
+		@flags.push(Flag.new(870, 400, 40, 40, @flag_img, self, 2))
 		
 		@spawnZones = Array.new()
-		@spawnZones.push(SpawnZone.new(380,330, 100, 200, bullet_image, self, 1))
-		@spawnZones.push(SpawnZone.new(400,100, 100, 100, bullet_image, self, 2))
+		spawnImg = Gosu::Image.new(self, "spawn.png", false)
+		@spawnZones.push(SpawnZone.new(400,325, 80, 190, spawnImg, self, 1))
+		@spawnZones.push(SpawnZone.new(520,325, 80, 190, spawnImg, self, 2))
 	end
 
 	def draw
@@ -144,9 +149,9 @@ class GameWindow < Gosu::Window
 		end
 	end
 
-	def mirrorObs(x, y, width, height)
-		@obstacles.push(Obstacle.new(x, y, width, height, @obstacle_img, self))
-		@obstacles.push(Obstacle.new(1000-width-x, y, width, height, @obstacle_img, self))
+	def mirrorObs(x, y, width, height, img=@squareImg)
+		@obstacles.push(Obstacle.new(x, y, width, height, img, self))
+		@obstacles.push(Obstacle.new(1000-width-x, y, width, height, img, self))
 	end
 
 end
