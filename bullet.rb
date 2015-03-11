@@ -20,8 +20,8 @@ class Bullet < Entity
 		end
 
 		# screen wrap
-		@x %= 1280
-		@y %= 800
+		#@x %= 1280
+		#@y %= 800
 	end
 
 	def draw

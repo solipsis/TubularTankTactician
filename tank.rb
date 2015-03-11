@@ -184,6 +184,13 @@ class Tank < Entity
 					@bullets.delete(bullet)
 				end
 			end
+			
+			@gameWindow.spawnZones.each do |zone|
+				if bullet.intersects?(zone)
+					@bullets.delete(bullet)
+				end
+			end
+
 			@gameWindow.players.each do |player|
 				player.tanks.each do |tank|
 					if bullet.intersects?(tank) && tank != self
@@ -195,6 +202,7 @@ class Tank < Entity
 					end
 				end
 			end
+
 
 
 		end
@@ -218,8 +226,13 @@ class Tank < Entity
 		color = Gosu::Color.new(0xFFFFFFFF)
 		#puts color.hue.to_s
 		if (@state.get_state_name() == :selected)
-			color.saturation = 0.8
-			color.value = 0.8
+			if (@team == 1)
+				color = Gosu::Color.new(0xff00ffff)
+			elsif (@team == 2)
+				color = Gosu::Color.new(0xff00ff00)
+			end
+			#color.saturation = 0.8
+			#color.value = 0.8
 		end
 
 		drawKey()
@@ -232,53 +245,67 @@ class Tank < Entity
 	end
 
 	def move(dir)
-		@dir = dir
-		old_x = @x
-		old_y = @y
-		speed = @speed
-		if (@has_flag)
-			speed = speed * (2.0/3.0)
-		end
+		if (!@dead)
 
-		case dir 
-		when :up
-			@y -= speed
-		when :down
-			@y += speed
-		when :right
-			@x += speed
-		when :left
-			@x -= speed
-		end
-
-		@player.tanks.each do |tank|
-			if(self.intersects?(tank) && tank != self)
-				@x = old_x
-				@y = old_y
-				#puts "intersect"
-				break
+			@dir = dir
+			old_x = @x
+			old_y = @y
+			speed = @speed
+			if (@has_flag)
+				speed = speed * (2.0/3.0)
 			end
-		end
 
-		@gameWindow.obstacles.each do |obs|
-			if(self.intersects?(obs))
-				@x = old_x
-				@y = old_y
-				break
+			case dir 
+			when :up
+				@y -= speed
+			when :down
+				@y += speed
+			when :right
+				@x += speed
+			when :left
+				@x -= speed
 			end
-		end
 
-		@gameWindow.flags.each do |flag|
-			if (self.intersects?(flag))
-				if flag.team != @team
-					grabFlag(flag)
-				elsif (flag.team == @team && @has_flag)
-					@gameWindow.scoreCounter.score(@team)
-					@flag.drop
-					@flag = nil
-					@has_flag = false
+			@gameWindow.players.each do |player|
+				player.tanks.each do |tank|
+					if(self.intersects?(tank) && tank != self)
+						@x = old_x
+						@y = old_y
+						#puts "intersect"
+						break
+					end
 				end
 			end
+
+			@gameWindow.obstacles.each do |obs|
+				if(self.intersects?(obs))
+					@x = old_x
+					@y = old_y
+					break
+				end
+			end
+
+			@gameWindow.flags.each do |flag|
+				if (self.intersects?(flag))
+					if flag.team != @team
+						grabFlag(flag)
+					elsif (flag.team == @team && @has_flag)
+						@gameWindow.scoreCounter.score(@team)
+						@flag.drop
+						@flag = nil
+						@has_flag = false
+					end
+				end
+			end
+
+			@gameWindow.spawnZones.each do |zone|
+				if (self.intersects?(zone) && @team != zone.team)
+					@x = old_x
+					@y = old_y
+					break
+				end
+			end
+
 		end
 
 		# screen wrap
@@ -324,17 +351,19 @@ class Tank < Entity
 	#dafuq is this shit
 	def die
 		#seriously wtf
-		@dead = true
-		if (@has_flag)
-			@has_flag = false
-			@flag.drop()
-			@flag = nil
+		if (!@dead)
+			@dead = true
+			if (@has_flag)
+				@has_flag = false
+				@flag.drop()
+				@flag = nil
+			end
+			
+			#@flag = nil
+			@x = -500
+			@y = -500
+			@time_till_respawn = @death_time
 		end
-		
-		#@flag = nil
-		@x = -500
-		@y = -500
-		@time_till_respawn = @death_time
 		#start death countdown timer
 	end
 
@@ -346,11 +375,13 @@ class Tank < Entity
 		@x = @init_x
 		@y = @init_y
 
-		@player.tanks.each do |tank|
-			if(self.intersects?(tank) && tank != self)
-				@x = dead_x
-				@y = dead_y
-				return
+		@gameWindow.players.each do |player|
+			player.tanks.each do |tank|
+				if(self.intersects?(tank) && tank != self)
+					@x = dead_x
+					@y = dead_y
+					return
+				end
 			end
 		end
 
