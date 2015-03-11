@@ -299,7 +299,7 @@ class Tank < Entity
 			end
 
 			@gameWindow.spawnZones.each do |zone|
-				if (self.intersects?(zone) && @team != zone.team)
+				if (self.intersects?(zone) && (@team != zone.team || @has_flag))
 					@x = old_x
 					@y = old_y
 					break
@@ -398,11 +398,11 @@ class Tank < Entity
 	def drawKey
 		case @id
 		when :t1
-			@font.draw("X", @x + 15, @y + 7, 20)
+			@font.draw("X", @x + 12, @y + 5, 20)
 		when :t2
-			@font.draw("Y", @x + 15, @y + 7, 20)
+			@font.draw("Y", @x + 12, @y + 5, 20)
 		when :t3
-			@font.draw("B", @x + 15, @y + 7, 20)
+			@font.draw("B", @x + 12, @y + 5, 20)
 		end
 	end
 

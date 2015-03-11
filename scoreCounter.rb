@@ -17,6 +17,6 @@ class ScoreCounter
 	end
 
 	def draw
-		@font.draw("Red: " + @team1_score.to_s + "                                       Blue: " + @team2_score.to_s, 200, 100, 20)
+		@font.draw("Red: " + @team1_score.to_s + "                                       Blue: " + @team2_score.to_s, 200, 50, 25)
 	end
 end

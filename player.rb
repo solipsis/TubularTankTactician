@@ -21,13 +21,13 @@ class Player
 		@input_map = input_map
 		
 		if (team == 1)
-			@tanks.push(Tank.new(100, 100, 50.0, 50.0, @img, @gameWindow, @team, self, :t1))
-			@tanks.push(Tank.new(200, 200, 50.0, 50.0, @img, @gameWindow, @team, self, :t2))
-			@tanks.push(Tank.new(300, 300, 50.0, 50.0, @img, @gameWindow, @team, self, :t3))
+			@tanks.push(Tank.new(430, 350, 45.0, 45.0, @img, @gameWindow, @team, self, :t1))
+			@tanks.push(Tank.new(430, 400, 45.0, 45.0, @img, @gameWindow, @team, self, :t2))
+			@tanks.push(Tank.new(430, 450, 45.0, 45.0, @img, @gameWindow, @team, self, :t3))
 		elsif (team == 2) 
-			@tanks.push(Tank.new(100, 400, 50.0, 50.0, @img, @gameWindow, @team, self, :t1))
-			@tanks.push(Tank.new(200, 500, 50.0, 50.0, @img, @gameWindow, @team, self, :t2))
-			@tanks.push(Tank.new(300, 600, 50.0, 50.0, @img, @gameWindow, @team, self, :t3))
+			@tanks.push(Tank.new(525, 350, 45.0, 45.0, @img, @gameWindow, @team, self, :t1))
+			@tanks.push(Tank.new(525, 400, 45.0, 45.0, @img, @gameWindow, @team, self, :t2))
+			@tanks.push(Tank.new(525, 450, 45.0, 45.0, @img, @gameWindow, @team, self, :t3))
 		end
 		#@p1 = Tank.new(5, 5, 50, 50, @img, self, 1)
 		
@@ -61,7 +61,7 @@ class Player
 		when @input_map[:t3]
 			toggle_state(:t3)
 		when @input_map[:debug]
-			@tanks[2].die()
+			
 		end
 
 	end
